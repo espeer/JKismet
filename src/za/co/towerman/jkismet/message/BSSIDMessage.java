@@ -279,7 +279,7 @@ public class BSSIDMessage extends KismetMessage {
     }
 
     @Capability("atype")
-    public void setTrafficType(AddressType addressType) {
+    public void setAddressType(AddressType addressType) {
         this.addressType = addressType;
     }
 
