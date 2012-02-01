@@ -53,10 +53,10 @@ public class BSSIDMessage extends KismetMessage {
         }
     }
     
-    public enum TrafficType {
+    public enum AddressType {
         UNKNOWN,
-        GUESSING,
-        TRANSPORT,
+        FACTORY_DEFAULT,
+        UDP_TCP,
         ARP,
         DHCP,
         AGGREGATED
@@ -140,7 +140,7 @@ public class BSSIDMessage extends KismetMessage {
     
     private String mac;
     private NetworkType networkType;
-    private TrafficType trafficType;
+    private AddressType addressType;
     private int channel;
     private List<SpectrumUtilization> frequencies;
     private int retries;
@@ -274,13 +274,13 @@ public class BSSIDMessage extends KismetMessage {
         this.lastTime = lastTime;
     }
 
-    public TrafficType getTrafficType() {
-        return trafficType;
+    public AddressType getAddressType() {
+        return addressType;
     }
 
     @Capability("atype")
-    public void setTrafficType(TrafficType trafficType) {
-        this.trafficType = trafficType;
+    public void setTrafficType(AddressType addressType) {
+        this.addressType = addressType;
     }
 
     public InetAddress getNetworkIp() {
@@ -702,7 +702,7 @@ public class BSSIDMessage extends KismetMessage {
 
     @Override
     public String toString() {
-        return "BSSIDMessage{" + "mac=" + mac + ", networkType=" + networkType + ", trafficType=" + trafficType + ", channel=" + channel + ", frequencies=" + frequencies + ", retries=" + retries + ", fragments=" + fragments + ", llcPackets=" + llcPackets + ", dataPackets=" + dataPackets + ", dataPacketsNew=" + dataPacketsNew + ", dataBytes=" + dataBytes + ", encryptedPackets=" + encryptedPackets + ", decryptedPackets=" + decryptedPackets + ", dupeIVPackets=" + dupeIVPackets + ", manufacturer=" + manufacturer + ", firstTime=" + firstTime + ", lastTime=" + lastTime + ", networkIp=" + networkIp + ", gatewayIp=" + gatewayIp + ", netmaskIp=" + netmaskIp + ", signalDBM=" + signalDBM + ", signalDBMMin=" + signalDBMMin + ", signalDBMMax=" + signalDBMMax + ", noiseDBM=" + noiseDBM + ", noiseDBMMin=" + noiseDBMMin + ", noiseDBMMax=" + noiseDBMMax + ", signalRSSI=" + signalRSSI + ", signalRSSIMin=" + signalRSSIMin + ", signalRSSIMax=" + signalRSSIMax + ", noiseRSSI=" + noiseRSSI + ", noiseRSSIMin=" + noiseRSSIMin + ", noiseRSSIMax=" + noiseRSSIMax + ", rateMax=" + rateMax + ", gpsFixed=" + gpsFixed + ", latitudeMin=" + latitudeMin + ", latitudeMax=" + latitudeMax + ", latitudeAggregate=" + latitudeAggregate + ", latitudeBest=" + latitudeBest + ", longitudeMin=" + longitudeMin + ", longitudeMax=" + longitudeMax + ", longitudeAggregate=" + longitudeAggregate + ", longitudeBest=" + longitudeBest + ", altitudeMin=" + altitudeMin + ", altitudeMax=" + altitudeMax + ", altitudeAggregate=" + altitudeAggregate + ", altitudeBest=" + altitudeBest + ", speedMin=" + speedMin + ", speedMax=" + speedMax + ", carriers=" + carriers + ", encodings=" + encodings + ", cryptographies=" + cryptographies + ", bssTimeStamp=" + bssTimeStamp + ", cdpDevice=" + cdpDevice + ", cdpPort=" + cdpPort + '}';
+        return "BSSIDMessage{" + "mac=" + mac + ", networkType=" + networkType + ", addressType=" + addressType + ", channel=" + channel + ", frequencies=" + frequencies + ", retries=" + retries + ", fragments=" + fragments + ", llcPackets=" + llcPackets + ", dataPackets=" + dataPackets + ", dataPacketsNew=" + dataPacketsNew + ", dataBytes=" + dataBytes + ", encryptedPackets=" + encryptedPackets + ", decryptedPackets=" + decryptedPackets + ", dupeIVPackets=" + dupeIVPackets + ", manufacturer=" + manufacturer + ", firstTime=" + firstTime + ", lastTime=" + lastTime + ", networkIp=" + networkIp + ", gatewayIp=" + gatewayIp + ", netmaskIp=" + netmaskIp + ", signalDBM=" + signalDBM + ", signalDBMMin=" + signalDBMMin + ", signalDBMMax=" + signalDBMMax + ", noiseDBM=" + noiseDBM + ", noiseDBMMin=" + noiseDBMMin + ", noiseDBMMax=" + noiseDBMMax + ", signalRSSI=" + signalRSSI + ", signalRSSIMin=" + signalRSSIMin + ", signalRSSIMax=" + signalRSSIMax + ", noiseRSSI=" + noiseRSSI + ", noiseRSSIMin=" + noiseRSSIMin + ", noiseRSSIMax=" + noiseRSSIMax + ", rateMax=" + rateMax + ", gpsFixed=" + gpsFixed + ", latitudeMin=" + latitudeMin + ", latitudeMax=" + latitudeMax + ", latitudeAggregate=" + latitudeAggregate + ", latitudeBest=" + latitudeBest + ", longitudeMin=" + longitudeMin + ", longitudeMax=" + longitudeMax + ", longitudeAggregate=" + longitudeAggregate + ", longitudeBest=" + longitudeBest + ", altitudeMin=" + altitudeMin + ", altitudeMax=" + altitudeMax + ", altitudeAggregate=" + altitudeAggregate + ", altitudeBest=" + altitudeBest + ", speedMin=" + speedMin + ", speedMax=" + speedMax + ", carriers=" + carriers + ", encodings=" + encodings + ", cryptographies=" + cryptographies + ", bssTimeStamp=" + bssTimeStamp + ", cdpDevice=" + cdpDevice + ", cdpPort=" + cdpPort + '}';
     }
     
      
