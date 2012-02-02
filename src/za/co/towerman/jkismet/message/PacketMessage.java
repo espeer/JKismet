@@ -319,7 +319,4 @@ public class PacketMessage extends KismetMessage {
         return "PacketMessage{" + "type=" + type + ", subType=" + subType + ", time=" + time + ", encrypted=" + encrypted + ", weakIV=" + weakIV + ", beaconRate=" + beaconRate + ", sourceMac=" + sourceMac + ", sourceIp=" + sourceIp + ", sourcePort=" + sourcePort + ", destinationMac=" + destinationMac + ", destinationIp=" + destinationIp + ", destinationPort=" + destinationPort + ", bssid=" + bssid + ", ssid=" + ssid + ", prototype=" + prototype + ", sourceName=" + sourceName + ", netbiosType=" + netbiosType + ", netbiosSource=" + netbiosSource + '}';
     }
     
-    
-    
-    
 }
