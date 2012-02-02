@@ -421,17 +421,7 @@ public class KismetConnection {
         StringBuilder current = new StringBuilder();
         for (int i = 0; i < str.length(); ++i) {
             if (str.charAt(i) == 1) {
-                if (delim) {
-                    result.add(current.toString());
-                    current.setLength(0);
-                    delim = false;
-                    if ((i + 1) < str.length() && str.charAt(i + 1) == ' ') {
-                        ++i;
-                    }
-                }
-                else {
-                    delim = true;
-                }
+                delim = !delim;
             }
             else if (str.charAt(i) == ' ' && !delim) {
                 result.add(current.toString());
@@ -444,7 +434,6 @@ public class KismetConnection {
         if (current.length() > 0) {
             result.add(current.toString());
         }
-        
         return result;
     }
 
