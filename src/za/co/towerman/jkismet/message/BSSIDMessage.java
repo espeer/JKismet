@@ -570,7 +570,7 @@ public class BSSIDMessage extends KismetMessage {
     @Capability("carrierset")
     public void setCarriers(int carriers) {
         this.carriers = EnumSet.noneOf(CarrierType.class);
-        for (int i = 0; i < 32; ++i) {
+        for (int i = 0; i < CarrierType.values().length; ++i) {
             if (((carriers >>> i) & 0x01) > 0) {
                 this.carriers.add(CarrierType.values()[i]);
             }
@@ -584,7 +584,7 @@ public class BSSIDMessage extends KismetMessage {
     @Capability("encodingset")
     public void setEncodings(int encodings) {
         this.encodings = EnumSet.noneOf(EncodingType.class);
-        for (int i = 0; i < 32; ++i) {
+        for (int i = 0; i < EncodingType.values().length; ++i) {
             if (((encodings >>> i) & 0x01) > 0) {
                 this.encodings.add(EncodingType.values()[i]);
             }
@@ -598,7 +598,7 @@ public class BSSIDMessage extends KismetMessage {
     @Capability("datacryptset")
     public void setCryptographies(int cryptographies) {
         this.cryptographies = EnumSet.noneOf(CryptoType.class);
-        for (int i = 0; i < 32; ++i) {
+        for (int i = 0; i < CryptoType.values().length; ++i) {
             if (((cryptographies >>> i) & 0x01) > 0) {
                 this.cryptographies.add(CryptoType.values()[i]);
             }
