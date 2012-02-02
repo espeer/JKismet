@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import za.co.towerman.jkismet.message.KismetMessage;
+import za.co.towerman.jkismet.message.ValueEnum;
 
 /**
  * @author espeer
@@ -334,27 +335,17 @@ public class KismetConnection {
         if (target.isEnum()) {
             Object[] constants = target.getEnumConstants();
             for (int i = 0; i < constants.length; ++i) {
-                try {
-                    Method valueMethod = constants[i].getClass().getMethod("value");
-                    Object tmp = coerce(valueMethod.getReturnType(), value);
-                    if (tmp.equals(valueMethod.invoke(constants[i]))) {
+                if (constants[i] instanceof ValueEnum) {
+                    if (Integer.parseInt(value) == ((ValueEnum) constants[i]).value()) {
                         return constants[i];
                     }
-                } 
-                catch (NoSuchMethodException ex) { } 
-                catch (SecurityException ex) { }
-                catch (IllegalAccessException ex) { }
-                catch (InvocationTargetException ex) { }
-                
-                try {
-                    if (value.equalsIgnoreCase((String) constants[i].getClass().getMethod("name").invoke(constants[i]))) {
-                        return constants[i];
-                    }
-                } 
-                catch (NoSuchMethodException ex) { } 
-                catch (SecurityException ex) { }
-                catch (IllegalAccessException ex) { }
-                catch (InvocationTargetException ex) { }
+                }
+            }
+            
+            for (int i = 0; i < constants.length; ++i) {
+                if (value.equalsIgnoreCase(((Enum) constants[i]).name())) {
+                    return constants[i];
+                }
             }
             
             return constants[Integer.parseInt(value)];

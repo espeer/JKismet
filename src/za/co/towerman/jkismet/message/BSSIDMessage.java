@@ -33,7 +33,7 @@ public class BSSIDMessage extends KismetMessage {
     
     public static final String PROTOCOL = "BSSID";
     
-    public enum NetworkType {
+    public enum NetworkType implements ValueEnum {
         MANAGED(0),
         ADHOC(1),
         PROBE(2),
@@ -48,6 +48,7 @@ public class BSSIDMessage extends KismetMessage {
             this.value = value;
         }
         
+        @Override
         public int value() {
             return value;
         }
