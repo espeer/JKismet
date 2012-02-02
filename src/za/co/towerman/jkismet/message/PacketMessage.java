@@ -25,12 +25,9 @@ import za.co.towerman.jkismet.Capability;
  *
  * @author espeer
  */
-public class PacketMessage {
-    public static final String PROTOCOL = "PACKET";
+public class PacketMessage extends KismetMessage {
     
-    public PacketMessage() {
-        System.out.println("Created PacketMessage");
-    }
+    public static final String PROTOCOL = "PACKET";
     
     public enum Type implements ValueEnum {
         NOISE(-2),
@@ -315,6 +312,11 @@ public class PacketMessage {
     @Capability("sourcename")
     public void setSourceName(String sourceName) {
         this.sourceName = sourceName;
+    }
+
+    @Override
+    public String toString() {
+        return "PacketMessage{" + "type=" + type + ", subType=" + subType + ", time=" + time + ", encrypted=" + encrypted + ", weakIV=" + weakIV + ", beaconRate=" + beaconRate + ", sourceMac=" + sourceMac + ", sourceIp=" + sourceIp + ", sourcePort=" + sourcePort + ", destinationMac=" + destinationMac + ", destinationIp=" + destinationIp + ", destinationPort=" + destinationPort + ", bssid=" + bssid + ", ssid=" + ssid + ", prototype=" + prototype + ", sourceName=" + sourceName + ", netbiosType=" + netbiosType + ", netbiosSource=" + netbiosSource + '}';
     }
     
     
