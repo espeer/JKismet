@@ -32,19 +32,11 @@ public abstract class KismetListener {
     Map<String, Set<String>> subscriptions = new HashMap<String, Set<String>>();
     
     public void subscribe(Class messageType, String fields) {
-        String protocol = null;
-        try {
-            protocol = (String) messageType.getField("PROTOCOL").get(null);
-        }
-        catch (NoSuchFieldException ex) {
+        if (! KismetMessage.class.isAssignableFrom(messageType)) {
             throw new IllegalArgumentException("invalid message type");
         }
-        catch (IllegalAccessException ex) { 
-            throw new IllegalArgumentException("invalid message type");
-        }
-        catch (ClassCastException ex) {
-            throw new IllegalArgumentException("invalid message type");
-        }
+        String protocol = messageType.getName();
+        protocol = protocol.substring(protocol.lastIndexOf('.') + 1, protocol.lastIndexOf("Message")).toUpperCase();
         
         if (subscriptions.get(protocol) == null) {
             subscriptions.put(protocol, new HashSet<String>());

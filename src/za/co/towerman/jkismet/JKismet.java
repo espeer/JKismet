@@ -18,6 +18,7 @@
 package za.co.towerman.jkismet;
 
 import java.io.IOException;
+import za.co.towerman.jkismet.message.BSSIDMessage;
 import za.co.towerman.jkismet.message.KismetMessage;
 import za.co.towerman.jkismet.message.PluginMessage;
 import za.co.towerman.jkismet.message.StatusMessage;
@@ -48,10 +49,10 @@ public class JKismet {
         };
         
         listener.subscribe(TimeMessage.class, "time");
-        //listener.subscribe(BSSIDMessage.class, "mac, channel, frequencies, networkType, addressType, dataBytes, carriers, encodings, cryptographies");
-        //listener.subscribe(PacketMessage.class, "type, subType");
         listener.subscribe(StatusMessage.class, "flags, text");
         listener.subscribe(PluginMessage.class, "name, description, version, file, unloadable, root");
+        //listener.subscribe(BSSIDMessage.class, "mac, channel, frequencies, networkType, addressType, dataBytes, carriers, encodings, cryptographies");
+        //listener.subscribe(PacketMessage.class, "type, subType");
         
         conn.register(listener);
         

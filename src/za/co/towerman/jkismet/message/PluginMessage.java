@@ -25,8 +25,6 @@ import za.co.towerman.jkismet.Capability;
  */
 public class PluginMessage extends KismetMessage {
     
-    public static final String PROTOCOL = "PLUGIN";
-    
     private String name;
     private String description;
     private String file;

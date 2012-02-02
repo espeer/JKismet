@@ -20,7 +20,6 @@ package za.co.towerman.jkismet.message;
 import java.util.EnumSet;
 import java.util.Set;
 import za.co.towerman.jkismet.Capability;
-import za.co.towerman.jkismet.message.BSSIDMessage.CryptoType;
 
 /**
  *
@@ -28,8 +27,6 @@ import za.co.towerman.jkismet.message.BSSIDMessage.CryptoType;
  */
 public class StatusMessage extends KismetMessage {
 
-    public static final String PROTOCOL = "STATUS";
-    
     public enum MessageFlag {
         DEBUG,
         INFO,

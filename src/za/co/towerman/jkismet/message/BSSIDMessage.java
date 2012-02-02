@@ -31,8 +31,6 @@ import za.co.towerman.jkismet.Capability;
  */
 public class BSSIDMessage extends KismetMessage {
     
-    public static final String PROTOCOL = "BSSID";
-    
     public enum NetworkType implements ValueEnum {
         MANAGED(0),
         ADHOC(1),

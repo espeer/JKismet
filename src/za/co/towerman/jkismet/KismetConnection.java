@@ -264,6 +264,9 @@ public class KismetConnection {
         List<String> values = this.split(value);
         
         synchronized (subscribed) {
+            if (subscribed.get(protocol) == null) {
+                return; // not subscribed to protocol
+            }
             for (String capability : subscribed.get(protocol)) {
                 for (Method method : message.getClass().getMethods()) {
                     Capability annotation = (Capability) method.getAnnotation(Capability.class);

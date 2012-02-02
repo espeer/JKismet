@@ -26,8 +26,6 @@ import za.co.towerman.jkismet.Capability;
  */
 public class TimeMessage extends KismetMessage {
 
-    public static final String PROTOCOL = "TIME";
-    
     private Date time;
     
     @Capability("timesec")

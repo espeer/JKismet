@@ -27,8 +27,6 @@ import za.co.towerman.jkismet.Capability;
  */
 public class PacketMessage extends KismetMessage {
     
-    public static final String PROTOCOL = "PACKET";
-    
     public enum Type implements ValueEnum {
         NOISE(-2),
         UNKNOWN(-1),
