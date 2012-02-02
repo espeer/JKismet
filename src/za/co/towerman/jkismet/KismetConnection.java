@@ -46,12 +46,12 @@ import za.co.towerman.jkismet.message.KismetMessage;
 public class KismetConnection {
 
     private Map<String, Set<String>> supported = new HashMap<String, Set<String>>();
-    private Map<String, Set<String>> subscribed = new HashMap<String, Set<String>>();
+    private final Map<String, Set<String>> subscribed = new HashMap<String, Set<String>>();
     
-    private List<KismetListener> listeners = new LinkedList<KismetListener>();
+    private final List<KismetListener> listeners = new LinkedList<KismetListener>();
+    
     private BufferedReader in;
     private BufferedWriter out;
-    private Socket socket;
     
     private boolean running = true;
     private boolean initialised = false;
@@ -62,7 +62,7 @@ public class KismetConnection {
     private String serverName = null;
     
     public KismetConnection(String host, int port) throws IOException {
-        socket = new Socket(host, port);
+        final Socket socket = new Socket(host, port);
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         
@@ -133,41 +133,50 @@ public class KismetConnection {
             }
         }
         
-        listeners.add(listener);
+        synchronized (listeners) {
+            listeners.add(listener);
+        }
         
         this.updateServerSubscriptions();
     }
     
     private void updateServerSubscriptions() throws IOException {
-        for (String protocol : subscribed.keySet()) {
-            out.write("!0 REMOVE " + protocol + "\r\n");
+        synchronized (subscribed) {
+            for (String protocol : subscribed.keySet()) {
+                out.write("!0 REMOVE " + protocol + "\r\n");
+            }
         }
         out.flush();
-        
-        subscribed.clear();
-        
-        for (KismetListener listener : listeners) {
-            for (Entry<String, Set<String>> entry : listener.subscriptions.entrySet()) {
-                Set<String> capabilities = subscribed.get(entry.getKey());
-                if (capabilities == null) {
-                    capabilities = new HashSet<String>();
-                    subscribed.put(entry.getKey(), capabilities);
+
+        synchronized (subscribed) {
+            subscribed.clear();
+
+            synchronized (listeners) {
+                for (KismetListener listener : listeners) {
+                    for (Entry<String, Set<String>> entry : listener.subscriptions.entrySet()) {
+                        Set<String> capabilities = subscribed.get(entry.getKey());
+                        if (capabilities == null) {
+                            capabilities = new HashSet<String>();
+                            subscribed.put(entry.getKey(), capabilities);
+                        }
+                        for (String capability : entry.getValue()) {
+                            capabilities.add(capability);
+                        }
+                    }
                 }
+            }
+
+            for (Entry<String, Set<String>> entry : subscribed.entrySet()) {
+                StringBuilder capabilities = new StringBuilder();
                 for (String capability : entry.getValue()) {
-                    capabilities.add(capability);
+                    if (capabilities.length() > 0) {
+                        capabilities.append(',');
+                    }
+                    capabilities.append(capability);
                 }
+                out.write("!0 ENABLE " + entry.getKey() + " " + capabilities.toString() + "\r\n");
             }
-        }
-        
-        for (Entry<String, Set<String>> entry : subscribed.entrySet()) {
-            StringBuilder capabilities = new StringBuilder();
-            for (String capability : entry.getValue()) {
-                if (capabilities.length() > 0) {
-                    capabilities.append(',');
-                }
-                capabilities.append(capability);
-            }
-            out.write("!0 ENABLE " + entry.getKey() + " " + capabilities.toString() + "\r\n");
+            
         }
         out.flush();
     }
@@ -253,25 +262,29 @@ public class KismetConnection {
         int idx = 0;
         List<String> values = this.split(value);
         
-        for (String capability : subscribed.get(protocol)) {
-            for (Method method : message.getClass().getMethods()) {
-                Capability annotation = (Capability) method.getAnnotation(Capability.class);
-                if (annotation != null && capability.equals(annotation.value()) && method.getParameterTypes().length == 1) {
-                    try {
-                        method.invoke(message, this.coerce(method.getParameterTypes()[0], values.get(idx)));
-                        break;
-                    } 
-                    catch (IllegalAccessException ex) { } 
-                    catch (IllegalArgumentException ex) { } 
-                    catch (InvocationTargetException ex) { }
+        synchronized (subscribed) {
+            for (String capability : subscribed.get(protocol)) {
+                for (Method method : message.getClass().getMethods()) {
+                    Capability annotation = (Capability) method.getAnnotation(Capability.class);
+                    if (annotation != null && capability.equals(annotation.value()) && method.getParameterTypes().length == 1) {
+                        try {
+                            method.invoke(message, this.coerce(method.getParameterTypes()[0], values.get(idx)));
+                            break;
+                        } 
+                        catch (IllegalAccessException ex) { } 
+                        catch (IllegalArgumentException ex) { } 
+                        catch (InvocationTargetException ex) { }
+                    }
                 }
+                ++idx;
             }
-            ++idx;
         }
         
-        for (KismetListener listener : listeners) {
-            if (listener.subscriptions.containsKey(protocol)) {
-                listener.onMessage(message);
+        synchronized (listeners) {
+            for (KismetListener listener : listeners) {
+                if (listener.subscriptions.containsKey(protocol)) {
+                    listener.onMessage(message);
+                }
             }
         }
     }
