@@ -17,7 +17,6 @@
  */
 package za.co.towerman.jkismet.message;
 
-import java.util.Date;
 import java.util.UUID;
 import za.co.towerman.jkismet.Capability;
 
@@ -37,7 +36,7 @@ public class SourceMessage extends KismetMessage {
     private int dwell;
     private int velocity;
     private long hopTimeSeconds;
-    private int hopTimeMicroSeconds;
+    private int hopTimeMicroseconds;
     private String channels;
     private boolean error;
     private String warning;
@@ -96,13 +95,13 @@ public class SourceMessage extends KismetMessage {
         this.hopTimeSeconds = hopTimeSeconds;
     }
 
-    public int getHopTimeMicroSeconds() {
-        return hopTimeMicroSeconds;
+    public int getHopTimeMicroseconds() {
+        return hopTimeMicroseconds;
     }
 
     @Capability("hop_time_usec")
-    public void setHopTimeMicroSeconds(int hopTimeMicroSeconds) {
-        this.hopTimeMicroSeconds = hopTimeMicroSeconds;
+    public void setHopTimeMicroseconds(int hopTimeMicroseconds) {
+        this.hopTimeMicroseconds = hopTimeMicroseconds;
     }
     
     public String getIface() {
@@ -170,7 +169,7 @@ public class SourceMessage extends KismetMessage {
 
     @Override
     public String toString() {
-        return "SourceMessage{" + "iface=" + iface + ", type=" + type + ", user=" + user + ", channel=" + channel + ", uuid=" + uuid + ", packets=" + packets + ", hop=" + hop + ", dwell=" + dwell + ", velocity=" + velocity + ", hopTimeSeconds=" + hopTimeSeconds + ", hopTimeMicroSeconds=" + hopTimeMicroSeconds + ", channels=" + channels + ", error=" + error + ", warning=" + warning + '}';
+        return "SourceMessage{" + "iface=" + iface + ", type=" + type + ", user=" + user + ", channel=" + channel + ", uuid=" + uuid + ", packets=" + packets + ", hop=" + hop + ", dwell=" + dwell + ", velocity=" + velocity + ", hopTimeSeconds=" + hopTimeSeconds + ", hopTimeMicroseconds=" + hopTimeMicroseconds + ", channels=" + channels + ", error=" + error + ", warning=" + warning + '}';
     }
     
 }
