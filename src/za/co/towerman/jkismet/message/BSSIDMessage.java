@@ -82,30 +82,6 @@ public class BSSIDMessage extends KismetMessage {
         GFSK
     }
     
-    public enum CryptoType {
-        NONE,
-        UNKNOWN,
-        WEP,
-        LAYER3,
-        WEP40,
-        WEP104,
-        TKIP,
-        WPA,
-        WPA_PSK,
-        WPA_AES_OCB,
-        WPA_AES_CCM,
-        WPA_LEAP,
-        WPA_TTLS,
-        WPA_TLS,
-        WPA_PEAP,
-        ISAKMP,
-        PPTP,
-        FORTRESS,
-        KEYGUARD,
-        UNKNOWN_NONWEP,
-        WPA_MIGRATION
-    }
-    
     public class SpectrumUtilization {
         private int frequency;
         private int packets;

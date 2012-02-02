@@ -425,16 +425,17 @@ public class KismetConnection {
                     result.add(current.toString());
                     current.setLength(0);
                     delim = false;
+                    if ((i + 1) < str.length() && str.charAt(i + 1) == ' ') {
+                        ++i;
+                    }
                 }
                 else {
                     delim = true;
                 }
             }
             else if (str.charAt(i) == ' ' && !delim) {
-                if (current.length() > 0) {
-                    result.add(current.toString());
-                    current.setLength(0);
-                }
+                result.add(current.toString());
+                current.setLength(0);
             }
             else {
                 current.append(str.charAt(i));
@@ -443,6 +444,7 @@ public class KismetConnection {
         if (current.length() > 0) {
             result.add(current.toString());
         }
+        
         return result;
     }
 

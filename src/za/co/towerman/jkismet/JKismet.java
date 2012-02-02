@@ -18,10 +18,8 @@
 package za.co.towerman.jkismet;
 
 import java.io.IOException;
-import za.co.towerman.jkismet.message.AlertMessage;
 import za.co.towerman.jkismet.message.KismetMessage;
-import za.co.towerman.jkismet.message.StatusMessage;
-import za.co.towerman.jkismet.message.TimeMessage;
+import za.co.towerman.jkismet.message.SSIDMessage;
 
 /**
  *
@@ -47,11 +45,12 @@ public class JKismet {
             }
         };
         
-        listener.subscribe(TimeMessage.class, "time");
-        listener.subscribe(StatusMessage.class, "flags, text");
-        listener.subscribe(AlertMessage.class, "time, timeMicroseconds, header, bssid, source, destination, other, channel, text");
+        //listener.subscribe(TimeMessage.class, "time");
+        //listener.subscribe(StatusMessage.class, "flags, text");
+        //listener.subscribe(AlertMessage.class, "time, timeMicroseconds, header, bssid, source, destination, other, channel, text");
         //listener.subscribe(SourceMessage.class, "iface,type,user,channel,channels,uuid,packets,hop,velocity,dwell,hopTimeSeconds,hopTimeMicroSeconds,error,warning");
         //listener.subscribe(PluginMessage.class, "name, description, version, file, unloadable, root");
+        listener.subscribe(SSIDMessage.class, "name, mac, type, checksum, beaconInfo, cryptographies, cloaked, firstTime, lastTime, maxRate, packets, beacons, channels");
         //listener.subscribe(BSSIDMessage.class, "mac, channel, frequencies, networkType, addressType, dataBytes, carriers, encodings, cryptographies");
         //listener.subscribe(PacketMessage.class, "type, subType");
         
