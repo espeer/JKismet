@@ -17,6 +17,8 @@
  */
 package za.co.towerman.jkismet.message;
 
+import java.net.InetAddress;
+import java.util.Date;
 import za.co.towerman.jkismet.Capability;
 
 /**
@@ -123,6 +125,22 @@ public class PacketMessage {
     
     private Type type;
     private int subType;
+    private Date time;
+    private boolean encrypted;
+    private boolean weakIV;
+    private int beaconRate;
+    private String sourceMac;
+    private InetAddress sourceIp;
+    private int sourcePort;
+    private String destinationMac;
+    private InetAddress destinationIp;
+    private int destinationPort;
+    private String bssid;
+    private String ssid;
+    private String prototype;
+    private String sourceName;
+    private int netbiosType;
+    private String netbiosSource;
     
     public Type getType() {
         return type;
@@ -154,6 +172,152 @@ public class PacketMessage {
     public void setSubType(int subType) {
         this.subType = subType;
     }
+
+    public Date getTime() {
+        return time;
+    }
+
+    @Capability("timesec")
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
+    public boolean isEncrypted() {
+        return encrypted;
+    }
+
+    @Capability("encrypted")
+    public void setEncrypted(boolean encrypted) {
+        this.encrypted = encrypted;
+    }
+
+    public boolean isWeakIV() {
+        return weakIV;
+    }
+
+    @Capability("weak")
+    public void setWeakIV(boolean weakIV) {
+        this.weakIV = weakIV;
+    }
+
+    public int getBeaconRate() {
+        return beaconRate;
+    }
+
+    @Capability("beaconrate")
+    public void setBeaconRate(int beaconRate) {
+        this.beaconRate = beaconRate;
+    }
+
+    public String getBssid() {
+        return bssid;
+    }
+
+    @Capability("bssid")
+    public void setBssid(String bssid) {
+        this.bssid = bssid;
+    }
+
+    public String getDestinationMac() {
+        return destinationMac;
+    }
+
+    @Capability("destmac")
+    public void setDestinationMac(String destinationMac) {
+        this.destinationMac = destinationMac;
+    }
+
+    public String getSourceMac() {
+        return sourceMac;
+    }
+
+    @Capability("sourcemac")
+    public void setSourceMac(String sourceMac) {
+        this.sourceMac = sourceMac;
+    }
+
+    public String getSsid() {
+        return ssid;
+    }
+
+    @Capability("ssid")
+    public void setSsid(String ssid) {
+        this.ssid = ssid;
+    }
+
+    public InetAddress getDestinationIp() {
+        return destinationIp;
+    }
+
+    @Capability("destip")
+    public void setDestinationIp(InetAddress destinationIp) {
+        this.destinationIp = destinationIp;
+    }
+
+    public int getDestinationPort() {
+        return destinationPort;
+    }
+
+    @Capability("destport")
+    public void setDestinationPort(int destinationPort) {
+        this.destinationPort = destinationPort;
+    }
+
+    public InetAddress getSourceIp() {
+        return sourceIp;
+    }
+
+    @Capability("sourceip")
+    public void setSourceIp(InetAddress sourceIp) {
+        this.sourceIp = sourceIp;
+    }
+
+    public int getSourcePort() {
+        return sourcePort;
+    }
+
+    @Capability("sourceport")
+    public void setSourcePort(int sourcePort) {
+        this.sourcePort = sourcePort;
+    }
+
+    public String getNetbiosSource() {
+        return netbiosSource;
+    }
+
+    @Capability("nbsource")
+    public void setNetbiosSource(String netbiosSource) {
+        this.netbiosSource = netbiosSource;
+    }
+
+    public int getNetbiosType() {
+        return netbiosType;
+    }
+
+    @Capability("nbtype")
+    public void setNetbiosType(int netbiosType) {
+        this.netbiosType = netbiosType;
+    }
+
+    public String getPrototype() {
+        return prototype;
+    }
+
+    @Capability("protoype")
+    public void setPrototype(String prototype) {
+        this.prototype = prototype;
+    }
+
+    public String getSourceName() {
+        return sourceName;
+    }
+
+    @Capability("sourcename")
+    public void setSourceName(String sourceName) {
+        this.sourceName = sourceName;
+    }
+    
+    
     
     
 }
