@@ -420,7 +420,7 @@ public class KismetConnection {
         boolean delim = false;
         StringBuilder current = new StringBuilder();
         for (int i = 0; i < str.length(); ++i) {
-            if (str.charAt(i) == 1) {
+            if (str.charAt(i) == 0x01) {
                 delim = !delim;
             }
             else if (str.charAt(i) == ' ' && !delim) {
