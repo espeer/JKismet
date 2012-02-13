@@ -17,10 +17,12 @@
  */
 package za.co.towerman.jkismet;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import za.co.towerman.jkismet.message.KismetMessage;
 
@@ -29,13 +31,14 @@ import za.co.towerman.jkismet.message.KismetMessage;
  * @author espeer
  */
 public abstract class KismetListener {
-    Map<String, Set<String>> subscriptions = new HashMap<String, Set<String>>();
+    KismetConnection connection = null;
+    Map<String, Set<Class>> subscriptions = new HashMap<String, Set<Class>>();
+    Map<Class, Set<String>> capabilities = new HashMap<Class, Set<String>>();
     
-    public void subscribe(Class messageType, String fields) {
+    public void subscribe(Class messageType, String fields) throws IOException {
         if (! KismetMessage.class.isAssignableFrom(messageType)) {
             throw new IllegalArgumentException("invalid message type: must implement KismetMessage interface");
         }
-        
         
         Protocol protocol = (Protocol) messageType.getAnnotation(Protocol.class);
         
@@ -43,19 +46,40 @@ public abstract class KismetListener {
             throw new IllegalArgumentException("invalid message type: must declare protocol via annotation");
         }
         
-        if (subscriptions.get(protocol.value()) == null) {
-            subscriptions.put(protocol.value(), new HashSet<String>());
+        if (connection != null) {
+            this.checkServerSupport(connection);
+        }
+        
+        Set<Class> messageSet = subscriptions.get(protocol.value());
+        
+        if (messageSet == null) {
+            messageSet = new HashSet<Class>();
+            subscriptions.put(protocol.value(), messageSet);
+        }
+        
+        messageSet.add(messageType);
+        
+        Set<String> fieldSet = capabilities.get(messageType);
+        
+        if (fieldSet == null) {
+            fieldSet = new HashSet<String>();
+            capabilities.put(messageType, fieldSet);
         }
         
         for (String field : fields.split(",")) {
             field = field.trim();
             
             Capability capability = this.findCapability(messageType, field);
+            
             if (capability == null) {
                 throw new IllegalArgumentException("invalid field: " + field);
             }
             
-            subscriptions.get(protocol.value()).add(capability.value());
+            fieldSet.add(capability.value());
+        }
+        
+        if (connection != null) {
+            connection.updateServerSubscriptions();
         }
     }
     
@@ -68,6 +92,22 @@ public abstract class KismetListener {
         }
         
         return null;
+    }
+
+    void checkServerSupport(KismetConnection c) {
+        for (Entry<String, Set<Class>> entry : subscriptions.entrySet()) {  
+            if (! c.getSupportedProtocols().contains(entry.getKey())) {
+                throw new IllegalArgumentException("server does not support protocol: " + entry.getKey());
+            }
+            
+            for (Class messageType : entry.getValue()) {
+                for (String capability : capabilities.get(messageType)) {
+                    if (!  c.getSupportedCapabilities(entry.getKey()).contains(capability)) {
+                        throw new IllegalArgumentException("server does not support capability: \"" + capability + "\" for protocol: \"" + entry.getKey() + "\"");
+                    }
+                }
+            }
+        }
     }
     
     public abstract void onMessage(KismetMessage message);

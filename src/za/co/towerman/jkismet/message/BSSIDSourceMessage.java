@@ -27,7 +27,7 @@ import za.co.towerman.jkismet.Protocol;
  * @author espeer
  */
 @Protocol("BSSIDSRC")
-public class BSSIDSrcMessage implements KismetMessage {
+public class BSSIDSourceMessage implements KismetMessage {
     
     private String mac;
     private UUID uuid;
@@ -72,7 +72,7 @@ public class BSSIDSrcMessage implements KismetMessage {
 
     @Override
     public String toString() {
-        return "BSSIDSRCMessage{" + "mac=" + mac + ", uuid=" + uuid + ", lastTime=" + lastTime + ", packets=" + packets + '}';
+        return "BSSIDSourceMessage{" + "mac=" + mac + ", uuid=" + uuid + ", lastTime=" + lastTime + ", packets=" + packets + '}';
     }
     
     

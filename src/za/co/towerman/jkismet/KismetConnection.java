@@ -39,6 +39,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import za.co.towerman.jkismet.message.KismetMessage;
 import za.co.towerman.jkismet.message.ValueEnum;
 
@@ -46,12 +48,11 @@ import za.co.towerman.jkismet.message.ValueEnum;
  * @author espeer
  */
 public class KismetConnection {
-
-    private Map<String, Set<String>> supported = new HashMap<String, Set<String>>();
-    private final Map<String, Set<String>> subscribed = new HashMap<String, Set<String>>();
-    
+    private final Map<String, Set<String>> supported = new HashMap<String, Set<String>>();
     private final List<KismetListener> listeners = new LinkedList<KismetListener>();
+    private final Map<String, List<String>> subscribed = new HashMap<String, List<String>>();
     
+    private final Socket socket;
     private BufferedReader in;
     private BufferedWriter out;
     
@@ -64,7 +65,7 @@ public class KismetConnection {
     private String serverName = null;
     
     public KismetConnection(String host, int port) throws IOException {
-        final Socket socket = new Socket(host, port);
+        socket = new Socket(host, port);
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         
@@ -122,64 +123,89 @@ public class KismetConnection {
         return version;
     }
     
+    public Set<String> getSupportedProtocols() {
+        return supported.keySet();
+    }
+    
+    public Set<String> getSupportedCapabilities(String protocol) {
+        return supported.get(protocol);
+    }
+        
     public void register(KismetListener listener) throws IOException {
-        for (String protocol : listener.subscriptions.keySet()) {
-            if (! supported.containsKey(protocol)) {
-                throw new IllegalArgumentException("server does not support protocol: " + protocol);
-            }
-            
-            for (String capability : listener.subscriptions.get(protocol)) {
-                if (! supported.get(protocol).contains(capability)) {
-                    throw new IllegalArgumentException("server does not support capability: \"" + capability + "\" for protocol: \"" + protocol + "\"");
-                }
-            }
+        if (listener.connection != null) {
+            throw new IllegalArgumentException("listener already bound to connection: " + listener.connection.socket);
         }
+        
+        listener.checkServerSupport(this);
         
         synchronized (listeners) {
             listeners.add(listener);
         }
         
+        listener.connection = this;
+        
         this.updateServerSubscriptions();
     }
     
-    private void updateServerSubscriptions() throws IOException {
-        synchronized (subscribed) {
-            for (String protocol : subscribed.keySet()) {
-                out.write("!0 REMOVE " + protocol + "\r\n");
-            }
+    public void deregister(KismetListener listener) throws IOException {
+        if (listener.connection != this) {
+            throw new IllegalArgumentException("listener is not bound to connection: " + this.socket);
         }
-        out.flush();
-
-        synchronized (subscribed) {
-            subscribed.clear();
-
-            synchronized (listeners) {
-                for (KismetListener listener : listeners) {
-                    for (Entry<String, Set<String>> entry : listener.subscriptions.entrySet()) {
-                        Set<String> capabilities = subscribed.get(entry.getKey());
-                        if (capabilities == null) {
-                            capabilities = new HashSet<String>();
-                            subscribed.put(entry.getKey(), capabilities);
-                        }
-                        for (String capability : entry.getValue()) {
+        
+        synchronized (listeners) {
+            listeners.remove(listener);
+        }
+        
+        listener.connection = null;
+        
+        this.updateServerSubscriptions();
+    }
+    
+    void updateServerSubscriptions() throws IOException {
+        synchronized (listeners) {
+            Map<String, Set<String>> needed = new HashMap<String, Set<String>>();
+        
+            for (KismetListener listener : listeners) {
+                for (Entry<String, Set<Class>> entry : listener.subscriptions.entrySet()) {
+                    Set<String> capabilities = needed.get(entry.getKey());
+                    if (capabilities == null) {
+                        capabilities = new HashSet<String>();
+                        needed.put(entry.getKey(), capabilities);
+                    }
+                    
+                    for (Class messageType : entry.getValue()) {
+                        for (String capability : listener.capabilities.get(messageType)) {
                             capabilities.add(capability);
                         }
                     }
                 }
             }
-
-            for (Entry<String, Set<String>> entry : subscribed.entrySet()) {
-                StringBuilder capabilities = new StringBuilder();
-                for (String capability : entry.getValue()) {
-                    if (capabilities.length() > 0) {
-                        capabilities.append(',');
-                    }
-                    capabilities.append(capability);
+            
+            for (String protocol : subscribed.keySet()) {
+                if (! needed.containsKey(protocol)) {
+                    out.write("!0 REMOVE " + protocol + "\r\n");
+                    System.out.println("!0 REMOVE " + protocol);
                 }
-                out.write("!0 ENABLE " + entry.getKey() + " " + capabilities.toString() + "\r\n");
             }
             
+            subscribed.clear();
+            
+            for (Entry<String, Set<String>> entry : needed.entrySet()) {
+                List<String> capabilities = new ArrayList<String>();
+                StringBuilder builder = new StringBuilder();
+                for (String capability : entry.getValue()) {
+                    if (builder.length() > 0) {
+                        builder.append(',');
+                    }
+                    builder.append(capability);
+                    capabilities.add(capability);
+                }
+                out.write("!0 ENABLE " + entry.getKey() + " " + builder.toString() + "\r\n");
+                System.out.println("!0 ENABLE " + entry.getKey() + " " + builder.toString());
+                subscribed.put(entry.getKey(), capabilities);
+            }
         }
+        
         out.flush();
     }
     
@@ -256,42 +282,40 @@ public class KismetConnection {
     }
 
     private void parseProtocol(String protocol, String value) {
-        KismetMessage message = createMessage(protocol);
-        if (message == null) {
-            return; // unsupported message
-        }
-        
-        int idx = 0;
+        System.out.println("Parsing protocol: " + protocol + "<" + value + ">");
+        List<String> capabilities = subscribed.get(protocol);
         List<String> values = this.split(value);
-        
-        synchronized (subscribed) {
-            if (subscribed.get(protocol) == null) {
+            
+        if (capabilities == null) {
                 return; // not subscribed to protocol
-            }
-            for (String capability : subscribed.get(protocol)) {
-                for (Method method : message.getClass().getMethods()) {
-                    Capability annotation = (Capability) method.getAnnotation(Capability.class);
-                    if (annotation != null && capability.equals(annotation.value()) && method.getParameterTypes().length == 1) {
-                        try {
-                            method.invoke(message, this.coerce(method.getParameterTypes()[0], values.get(idx)));
-                            break;
-                        } 
-                        catch (IllegalAccessException ex) { } 
-                        catch (IllegalArgumentException ex) { } 
-                        catch (InvocationTargetException ex) { }
-                    }
-                }
-                ++idx;
-            }
         }
         
         synchronized (listeners) {
             for (KismetListener listener : listeners) {
-                if (listener.subscriptions.containsKey(protocol)) {
-                    listener.onMessage(message);
+                Set<Class> messageTypes = listener.subscriptions.get(protocol);
+                if (messageTypes != null) {
+                    for (Class messageType : messageTypes) {
+                        try {
+                            KismetMessage message = (KismetMessage) messageType.newInstance();
+                            for (String capability : listener.capabilities.get(messageType)) {
+                                for (Method method : messageType.getMethods()) {
+                                    Capability annotation = (Capability) method.getAnnotation(Capability.class);
+                                    if (annotation != null && capability.equals(annotation.value()) && method.getParameterTypes().length == 1) {
+                                        method.invoke(message, this.coerce(method.getParameterTypes()[0], values.get(capabilities.indexOf(capability))));
+                                        break;
+                                    }
+                                }
+                            }
+                            listener.onMessage(message);
+                        } 
+                        catch (InstantiationException ex) { } 
+                        catch (IllegalAccessException ex) { }
+                        catch (InvocationTargetException ex) { }
+                    }
                 }
             }
         }
+       
     }
     
     private Object coerce(Class target, String value) {
@@ -382,37 +406,6 @@ public class KismetConnection {
         }
 
         return value;
-    }
-    
-    private KismetMessage createMessage(String protocol) { 
-        StringBuilder messageClass = new StringBuilder();
-        messageClass.append(KismetMessage.class.getPackage().getName());
-        messageClass.append('.');
-        messageClass.append(Character.toUpperCase(protocol.charAt(0)));
-        messageClass.append(protocol.substring(1).toLowerCase());
-        messageClass.append("Message");
-        try {
-            return (KismetMessage) Class.forName(messageClass.toString()).newInstance();
-        } 
-        catch (InstantiationException ex) { } 
-        catch (IllegalAccessException ex) { }
-        catch (ClassNotFoundException ex) { }
-        catch (ClassCastException ex) { }
-
-        messageClass = new StringBuilder();
-        messageClass.append(KismetMessage.class.getPackage().getName());
-        messageClass.append('.');
-        messageClass.append(protocol);
-        messageClass.append("Message");
-        try {
-            return (KismetMessage) Class.forName(messageClass.toString()).newInstance();
-        } 
-        catch (InstantiationException ex) { } 
-        catch (IllegalAccessException ex) { }
-        catch (ClassNotFoundException ex) { }
-        catch (ClassCastException ex) { }
-
-        return null;
     }
     
     private List<String> split(String str) {

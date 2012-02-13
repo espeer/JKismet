@@ -19,6 +19,7 @@ package za.co.towerman.jkismet;
 
 import java.io.IOException;
 import za.co.towerman.jkismet.message.AlertMessage;
+import za.co.towerman.jkismet.message.BSSIDSourceMessage;
 import za.co.towerman.jkismet.message.InfoMessage;
 import za.co.towerman.jkismet.message.KismetMessage;
 import za.co.towerman.jkismet.message.StatusMessage;
@@ -53,7 +54,7 @@ public class JKismet {
         listener.subscribe(StatusMessage.class, "flags, text");
         listener.subscribe(AlertMessage.class, "time, timeMicroseconds, header, bssid, source, destination, other, channel, text");
         listener.subscribe(InfoMessage.class, "networks, packets, noise, droppedPackets, filteredPackets");
-        //listener.subscribe(BSSIDSRCMessage.class, "mac, packets, uuid, lastTime");
+        listener.subscribe(BSSIDSourceMessage.class, "mac, packets, uuid, lastTime");
         //listener.subscribe(SourceMessage.class, "iface,type,user,channel,channels,uuid,packets,hop,velocity,dwell,hopTimeSeconds,hopTimeMicroSeconds,error,warning");
         //listener.subscribe(PluginMessage.class, "name, description, version, file, unloadable, root");
         //listener.subscribe(SSIDMessage.class, "name, mac, type, checksum, beaconInfo, cryptographies, cloaked, firstTime, lastTime, maxRate, packets, beacons, channels");
