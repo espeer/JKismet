@@ -33,13 +33,18 @@ public abstract class KismetListener {
     
     public void subscribe(Class messageType, String fields) {
         if (! KismetMessage.class.isAssignableFrom(messageType)) {
-            throw new IllegalArgumentException("invalid message type");
+            throw new IllegalArgumentException("invalid message type: must implement KismetMessage interface");
         }
-        String protocol = messageType.getName();
-        protocol = protocol.substring(protocol.lastIndexOf('.') + 1, protocol.lastIndexOf("Message")).toUpperCase();
         
-        if (subscriptions.get(protocol) == null) {
-            subscriptions.put(protocol, new HashSet<String>());
+        
+        Protocol protocol = (Protocol) messageType.getAnnotation(Protocol.class);
+        
+        if (protocol == null) {
+            throw new IllegalArgumentException("invalid message type: must declare protocol via annotation");
+        }
+        
+        if (subscriptions.get(protocol.value()) == null) {
+            subscriptions.put(protocol.value(), new HashSet<String>());
         }
         
         for (String field : fields.split(",")) {
@@ -50,7 +55,7 @@ public abstract class KismetListener {
                 throw new IllegalArgumentException("invalid field: " + field);
             }
             
-            subscriptions.get(protocol).add(capability.value());
+            subscriptions.get(protocol.value()).add(capability.value());
         }
     }
     

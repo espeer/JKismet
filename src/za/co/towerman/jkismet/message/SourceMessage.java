@@ -19,12 +19,14 @@ package za.co.towerman.jkismet.message;
 
 import java.util.UUID;
 import za.co.towerman.jkismet.Capability;
+import za.co.towerman.jkismet.Protocol;
 
 /**
  *
  * @author espeer
  */
-public class SourceMessage extends KismetMessage {
+@Protocol("SOURCE")
+public class SourceMessage implements KismetMessage {
     
     private String iface;
     private String type;

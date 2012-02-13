@@ -20,12 +20,14 @@ package za.co.towerman.jkismet.message;
 import java.util.Date;
 import java.util.UUID;
 import za.co.towerman.jkismet.Capability;
+import za.co.towerman.jkismet.Protocol;
 
 /**
  *
  * @author espeer
  */
-public class BSSIDSRCMessage extends KismetMessage {
+@Protocol("BSSIDSRC")
+public class BSSIDSrcMessage implements KismetMessage {
     
     private String mac;
     private UUID uuid;

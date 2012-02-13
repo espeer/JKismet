@@ -19,12 +19,14 @@ package za.co.towerman.jkismet.message;
 
 import java.util.Date;
 import za.co.towerman.jkismet.Capability;
+import za.co.towerman.jkismet.Protocol;
 
 /**
  *
  * @author espeer
  */
-public class AlertMessage extends KismetMessage {
+@Protocol("ALERT")
+public class AlertMessage implements KismetMessage {
     
     private Date time;
     private int timeMicroseconds;

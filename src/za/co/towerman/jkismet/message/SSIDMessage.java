@@ -23,12 +23,14 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import za.co.towerman.jkismet.Capability;
+import za.co.towerman.jkismet.Protocol;
 
 /**
  *
  * @author espeer
  */
-public class SSIDMessage extends KismetMessage {
+@Protocol("SSID")
+public class SSIDMessage implements KismetMessage {
     
     public class Channel {
         private String country;

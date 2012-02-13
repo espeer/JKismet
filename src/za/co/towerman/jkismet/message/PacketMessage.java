@@ -20,12 +20,14 @@ package za.co.towerman.jkismet.message;
 import java.net.InetAddress;
 import java.util.Date;
 import za.co.towerman.jkismet.Capability;
+import za.co.towerman.jkismet.Protocol;
 
 /**
  *
  * @author espeer
  */
-public class PacketMessage extends KismetMessage {
+@Protocol("PACKET")
+public class PacketMessage implements KismetMessage {
     
     public enum Type implements ValueEnum {
         NOISE(-2),

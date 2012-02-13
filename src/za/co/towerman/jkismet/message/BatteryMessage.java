@@ -18,12 +18,14 @@
 package za.co.towerman.jkismet.message;
 
 import za.co.towerman.jkismet.Capability;
+import za.co.towerman.jkismet.Protocol;
 
 /**
  *
  * @author espeer
  */
-public class BatteryMessage extends KismetMessage {
+@Protocol("BATTERY")
+public class BatteryMessage implements KismetMessage {
     private int percentage;
     private boolean mainsPowered;
     private boolean charging;

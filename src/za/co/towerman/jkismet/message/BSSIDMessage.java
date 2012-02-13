@@ -24,12 +24,14 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import za.co.towerman.jkismet.Capability;
+import za.co.towerman.jkismet.Protocol;
 
 /**
  *
  * @author espeer
  */
-public class BSSIDMessage extends KismetMessage {
+@Protocol("BSSID")
+public class BSSIDMessage implements KismetMessage {
     
     public enum NetworkType implements ValueEnum {
         MANAGED(0),

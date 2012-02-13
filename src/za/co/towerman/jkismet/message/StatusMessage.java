@@ -20,12 +20,14 @@ package za.co.towerman.jkismet.message;
 import java.util.EnumSet;
 import java.util.Set;
 import za.co.towerman.jkismet.Capability;
+import za.co.towerman.jkismet.Protocol;
 
 /**
  *
  * @author espeer
  */
-public class StatusMessage extends KismetMessage {
+@Protocol("STATUS")
+public class StatusMessage implements KismetMessage {
 
     public enum MessageFlag {
         DEBUG,

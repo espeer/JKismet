@@ -18,12 +18,14 @@
 package za.co.towerman.jkismet.message;
 
 import za.co.towerman.jkismet.Capability;
+import za.co.towerman.jkismet.Protocol;
 
 /**
  *
  * @author espeer
  */
-public class PluginMessage extends KismetMessage {
+@Protocol("PLUGIN")
+public class PluginMessage implements KismetMessage {
     
     private String name;
     private String description;

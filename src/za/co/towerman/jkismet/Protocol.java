@@ -1,5 +1,5 @@
 /**
- * za.co.towerman.jkismet.message.TimeMessage
+ * za.co.towerman.jkismet.Protocol
  * Copyright (C) 2012 Edwin Peer
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -15,33 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package za.co.towerman.jkismet.message;
+package za.co.towerman.jkismet;
 
-import java.util.Date;
-import za.co.towerman.jkismet.Capability;
-import za.co.towerman.jkismet.Protocol;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  *
  * @author espeer
  */
-@Protocol("TIME")
-public class TimeMessage implements KismetMessage {
-
-    private Date time;
-    
-    @Capability("timesec")
-    public void setTime(Date time) {
-        this.time = time;
-    }
-    
-    public Date getTime() {
-        return time;
-    }
-
-    @Override
-    public String toString() {
-        return "TimeMessage{" + "time=" + time + '}';
-    }
-    
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Protocol {
+    String value();
 }

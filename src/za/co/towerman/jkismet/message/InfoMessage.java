@@ -18,12 +18,14 @@
 package za.co.towerman.jkismet.message;
 
 import za.co.towerman.jkismet.Capability;
+import za.co.towerman.jkismet.Protocol;
 
 /**
  *
  * @author espeer
  */
-public class InfoMessage extends KismetMessage {
+@Protocol("INFO")
+public class InfoMessage implements KismetMessage {
     
     private int networks;
     private int packets;
