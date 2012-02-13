@@ -184,7 +184,6 @@ public class KismetConnection {
             for (String protocol : subscribed.keySet()) {
                 if (! needed.containsKey(protocol)) {
                     out.write("!0 REMOVE " + protocol + "\r\n");
-                    System.out.println("!0 REMOVE " + protocol);
                 }
             }
             
@@ -201,7 +200,6 @@ public class KismetConnection {
                     capabilities.add(capability);
                 }
                 out.write("!0 ENABLE " + entry.getKey() + " " + builder.toString() + "\r\n");
-                System.out.println("!0 ENABLE " + entry.getKey() + " " + builder.toString());
                 subscribed.put(entry.getKey(), capabilities);
             }
         }
@@ -282,7 +280,6 @@ public class KismetConnection {
     }
 
     private void parseProtocol(String protocol, String value) {
-        System.out.println("Parsing protocol: " + protocol + "<" + value + ">");
         List<String> capabilities = subscribed.get(protocol);
         List<String> values = this.split(value);
             
