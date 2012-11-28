@@ -18,6 +18,7 @@ import za.co.towerman.jkismet.message.KismetMessage;
 import za.co.towerman.jkismet.KismetListener;
 import za.co.towerman.jkismet.Protocol;
 import java.io.IOException;
+import java.util.Map.Entry;
 import junit.framework.Assert;
 import za.co.towerman.jkismet.KismetConnection;
 import org.junit.After;
@@ -147,4 +148,14 @@ public class AllCapabilitiesTest {
             listener.subscribe(protocolClass, capabilites);
         }
     }
+    
+    @Test
+    public void subscribeToSupportedProtocols() throws IOException {
+          for (Entry<String, Class<KismetMessage>> entry: pmap.entrySet()) {
+            Class<KismetMessage> protocolClass = entry.getValue();
+            String protocolName = entry.getKey();
+            String capabilites = join(conn.getSupportedCapabilities(protocolName),",");            
+            listener.subscribe(protocolClass, capabilites);
+          }
+    }    
 }
