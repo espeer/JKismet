@@ -31,7 +31,10 @@ import za.co.towerman.jkismet.message.KismetMessage;
 import za.co.towerman.jkismet.KismetListener;
 import za.co.towerman.jkismet.Protocol;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.Set;
 import junit.framework.Assert;
 import za.co.towerman.jkismet.KismetConnection;
 import org.junit.After;
@@ -47,6 +50,9 @@ public class ProtocolsAndCapabilitiesTest {
     private KismetConnection conn;
     private KismetListener listener;
     private Map<String, Class<KismetMessage>> pmap;
+    private static final Set<String> internalProtocols = new HashSet<String>(Arrays.asList(        
+         new String[] {"KISMET","ACK","ERROR","PROTOCOLS","CAPABILITY","TERMINATE"}
+    ));
     
     public ProtocolsAndCapabilitiesTest() {
     }
@@ -152,7 +158,7 @@ public class ProtocolsAndCapabilitiesTest {
         for (String protocolName : conn.getSupportedProtocols()) {
             Class<KismetMessage> protocolClass = pmap.get(protocolName);
             String capabilites = join(conn.getSupportedCapabilities(protocolName),",");            
-            if (protocolClass==null) {
+            if (protocolClass==null && !internalProtocols.contains(protocolName)) {
                 Assert.fail(protocolName+" is unsupported (capabilties are: "+capabilites+")");
             }
         }
