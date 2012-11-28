@@ -135,17 +135,13 @@ public class AllCapabilitiesTest {
     }
     
     @Test
-    public void subscribeToEverything() throws IOException {
+    public void checkUnsupportedProtocols() throws IOException {
         for (String protocolName : conn.getSupportedProtocols()) {
-            System.out.println("Looking for KismetMessage to match "+protocolName);
             Class<KismetMessage> protocolClass = pmap.get(protocolName);
             String capabilites = join(conn.getSupportedCapabilities(protocolName),",");            
             if (protocolClass==null) {
-                System.out.println("Missing KismetMessage for "+protocolName);
-                System.out.println("Capability for "+protocolName+" is: "+capabilites);
+                Assert.fail(protocolName+" is unsupported (capabilties are: "+capabilites+")");
             }
-            Assert.assertNotNull(protocolClass);
-            listener.subscribe(protocolClass, capabilites);
         }
     }
     
@@ -154,8 +150,13 @@ public class AllCapabilitiesTest {
           for (Entry<String, Class<KismetMessage>> entry: pmap.entrySet()) {
             Class<KismetMessage> protocolClass = entry.getValue();
             String protocolName = entry.getKey();
-            String capabilites = join(conn.getSupportedCapabilities(protocolName),",");            
-            listener.subscribe(protocolClass, capabilites);
+            String capabilites = join(conn.getSupportedCapabilities(protocolName),",");
+            try {
+                listener.subscribe(protocolClass, capabilites);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Assert.fail(ex.toString());
+            }
           }
     }    
 }
