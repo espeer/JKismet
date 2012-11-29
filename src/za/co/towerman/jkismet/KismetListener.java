@@ -86,7 +86,7 @@ public abstract class KismetListener {
     private Capability findCapability(Class target, String field) {
         for (Method method : target.getMethods()) {
             Capability capability = method.getAnnotation(Capability.class);
-            if (capability != null) {
+            if (capability != null && method.getName().equalsIgnoreCase("set" + field)) {
                 return capability;
             }
         }
