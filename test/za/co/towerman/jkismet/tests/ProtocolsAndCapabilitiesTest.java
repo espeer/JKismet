@@ -31,6 +31,7 @@ import za.co.towerman.jkismet.message.KismetMessage;
 import za.co.towerman.jkismet.KismetListener;
 import za.co.towerman.jkismet.Protocol;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map.Entry;
@@ -40,6 +41,7 @@ import za.co.towerman.jkismet.KismetConnection;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import za.co.towerman.jkismet.Capability;
 
 /**
  *
@@ -51,7 +53,7 @@ public class ProtocolsAndCapabilitiesTest {
     private KismetListener listener;
     private Map<String, Class<KismetMessage>> pmap;
     private static final Set<String> internalProtocols = new HashSet<String>(Arrays.asList(        
-         new String[] {"KISMET","ACK","ERROR","PROTOCOLS","CAPABILITY","TERMINATE"}
+         new String[] {"KISMET","ACK","ERROR","PROTOCOLS","CAPABILITY","TERMINATE","REMOVE"}
     ));
     
     public ProtocolsAndCapabilitiesTest() {
@@ -153,28 +155,52 @@ public class ProtocolsAndCapabilitiesTest {
         return builder.toString();
     }
     
+    @Ignore
+    static Set<String> getMessageClassCapabilities(Class<KismetMessage> messageClass) {
+        Set<String> set = new HashSet<String>();
+        for (Method method : messageClass.getMethods()) {
+            String mName = method.getName();
+            Capability capability = method.getAnnotation(Capability.class);
+            if (capability != null && mName.startsWith("set")) {
+                set.add(mName.substring(3));
+            }
+        }
+        return set;
+    }
+
+    /**
+     * This checks for each protocol Kismet claims to support, whether there exists a
+     * matching built-in message classes in the za.co.towerman.jkismet.message package.
+     * 
+     * @throws IOException 
+     */
     @Test
     public void checkUnsupportedProtocols() throws IOException {
         for (String protocolName : conn.getSupportedProtocols()) {
             Class<KismetMessage> protocolClass = pmap.get(protocolName);
             String capabilites = join(conn.getSupportedCapabilities(protocolName),",");            
             if (protocolClass==null && !internalProtocols.contains(protocolName)) {
-                Assert.fail(protocolName+" is unsupported (capabilties are: "+capabilites+")");
+                Assert.fail(protocolName+" is unsupported (Kismet capabilties are: "+capabilites+")");
             }
         }
     }
-    
+    /**
+     * This test attempts to subscribe to each capability of the built-in message
+     * classes in the za.co.towerman.jkismet.message package.
+     * 
+     * @throws IOException 
+     */
     @Test
     public void subscribeToSupportedProtocols() throws IOException {
           for (Entry<String, Class<KismetMessage>> entry: pmap.entrySet()) {
-            Class<KismetMessage> protocolClass = entry.getValue();
+            Class<KismetMessage> messageClass = entry.getValue();
             String protocolName = entry.getKey();
-            String capabilites = join(conn.getSupportedCapabilities(protocolName),",");
+            String messageCapabilites = join(getMessageClassCapabilities(messageClass),",");
             try {
-                listener.subscribe(protocolClass, capabilites);
+                listener.subscribe(messageClass, messageCapabilites);
             } catch (Exception ex) {
                 ex.printStackTrace();
-                Assert.fail(ex.toString());
+                Assert.fail("Subscribing to "+protocolName+" failed: "+ex.toString());
             }
           }
     }    
